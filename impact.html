@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Impact - WattWatcher</title>
+  <style>
+    :root {
+      --blue-dark: #16425b;
+      --blue-mid: #2f6690;
+      --blue-light: #3a7ca5;
+      --sky: #81c3d7;
+      --cream: #d9dcd6;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--cream);
+      color: var(--blue-dark);
+      line-height: 1.6;
+    }
+
+    /* Navbar Styles */
+    nav {
+      background-color: var(--blue-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: white;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      position: relative;
+      padding-bottom: 2px;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      border-bottom: 2px solid var(--sky);
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--blue-mid);
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      color: var(--blue-light);
+      margin-top: 2rem;
+    }
+
+    ul {
+      list-style-type: disc;
+      margin-left: 2rem;
+    }
+
+    .section {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
+    }
+
+    footer {
+      background-color: var(--blue-dark);
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-end;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="logo">WattWatcher</div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="howitworks.html">About</a>
+      <a href="impact.html" class="active">The Impact</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h1>The Impact of WattWatcher</h1>
+
+    <div class="section">
+      <p>
+        Most people don’t know why their energy bill is high until it’s too late. And most tools on the market are built for engineers, utilities, or the wealthy.
+      </p>
+      <p>
+        We built <strong>WattWatcher</strong> to change that.
+      </p>
+      <ul>
+        <li>To make energy visibility accessible.</li>
+        <li>To help people learn, act, and save—without needing to be an expert.</li>
+        <li>To democratize energy efficiency.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Empowering Smart Homes</h2>
+      <p>
+        WattWatcher enables ordinary households to function like smart energy hubs. With real-time feedback and detailed breakdowns of appliance usage, families are empowered to make informed decisions — whether it’s reducing phantom power, timing laundry for off-peak hours, or simply understanding which devices consume the most energy.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>Shifting the Industry</h2>
+      <p>
+        By removing the need for expensive hardware and installers, WattWatcher sets a new standard for energy monitoring. It bridges the gap between the energy industry and the everyday consumer — making energy data readable, relevant, and actionable.
+      </p>
+      <p>
+        Our platform is already influencing how utilities, local governments, and sustainability programs approach energy awareness. We're driving a movement that puts the power back into the hands of people.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>Environmental Footprint</h2>
+      <p>
+        Energy waste isn’t just about cost — it’s about carbon. Every kilowatt saved through behavioral change or smarter decisions helps reduce emissions. WattWatcher makes this visible. We show the environmental impact of your savings in terms you can understand: trees planted, CO₂ avoided, and energy saved.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>Accessibility & Inclusion</h2>
+      <p>
+        Many energy management tools are out of reach for renters, low-income households, or those in shared living spaces. WattWatcher is designed for everyone. By using estimation engines and cloud-based logging, we eliminate the need for hardwired meters or technical know-how.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>A Growing Global Community</h2>
+      <p>
+        WattWatcher isn't just a tool — it's a community of users committed to a cleaner, more conscious future. Every person who tracks their energy with us contributes to a global effort to rethink energy use. Together, we’re building a smarter grid from the ground up.
+      </p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    © 2025 WattWatcher | All rights reserved
+  </footer>
+
+</body>
+</html>

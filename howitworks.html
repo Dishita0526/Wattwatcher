@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Story - WattWatcher</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #d9dcd6;
+            color: #16425B;
+            line-height: 1.6;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            background-color: #16425B;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 1.5rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar a:hover {
+            background-color: #81C3D7;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #16425B;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+        }
+
+        .story-columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            justify-content: space-between;
+        }
+
+        .story-columns div {
+            flex: 1 1 45%;
+        }
+
+        .italic {
+            font-style: italic;
+        }
+
+        .section {
+            margin-top: 60px;
+        }
+
+        .section h2 {
+            color: #16425B;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .image-section {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .image-section img {
+            width: 80%;
+            max-width: 600px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <h1>WattWatcher</h1>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="howitworks.html">About</a></li>
+            <li><a href="impact.html">The Impact</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>Our Story</h1>
+        <div class="story-columns">
+            <div>
+                <p>All of us at Wattwatchers are driven by a common cause. It’s how to do our bit to reduce harmful and wasteful energy consumption on our planet.</p>
+                <p>We know we can help with this. We’re all striving to achieve it in our own lives as well as through our work.</p>
+                <p>How do you do this? First you need to know what energy is being used at a site—whether it be a home, an apartment, an office, a factory, a school. Then, once informed by real data, you can adjust your behaviours, and influence others to optimise energy use.</p>
+                <p>The big question that Wattwatchers began with was: Where do you get the data for that?</p>
+            </div>
+            <div>
+                <p>Wattwatchers is a digital energy platform.</p>
+                <p>We love what we’re doing. We believe we are making a difference. We’re signed up for a brighter, better energy future.</p>
+                <p class="italic">The Wattwatchers Team</p>
+            </div>
+        </div>
+
+        <div class="image-section">
+            <img src="aboutImg.jpeg" alt="Smart energy monitoring via phone">
+        </div>
+
+        <div class="section">
+            <h2>Why We Built This</h2>
+            <p>Most people don’t know why their energy bill is high until it’s too late. And most tools on the market are built for engineers, utilities, or the wealthy.</p>
+            <p>We built WattWatcher to change that.</p>
+            <ul>
+                <li>To make energy visibility accessible.</li>
+                <li>To help people learn, act, and save—without needing to be an expert.</li>
+                <li>To democratize energy efficiency.</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

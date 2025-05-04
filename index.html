@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WattWatcher | Home</title>
+  <style>
+    :root {
+      --blue-dark: #16425b;
+      --blue-mid: #2f6690;
+      --blue-light: #3a7ca5;
+      --sky: #81c3d7;
+      --cream: #d9dcd6;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--cream);
+      color: var(--blue-dark);
+    }
+
+    header {
+      background-color: var(--blue-mid);
+      color: white;
+      padding: 1.8rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo {
+      height: 57.2px; /* 125px increased by 7% */
+      margin-right: 1rem;
+    }
+
+    .title h1 {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      font-size: 2.5rem;
+      color: #ffffff;
+    }
+
+    .title p {
+      margin: 0;
+      font-size: 1rem;
+      color: #ffffff;
+    }
+
+    nav a {
+      color: #ffffff;
+      text-decoration: none;
+      margin-left: 1.9rem;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: var(--sky);
+      text-decoration: underline;
+    }
+
+    main {
+      margin: 0;
+      padding: 0;
+    }
+
+    .hero-image {
+      width: 100%;
+      height: 100vh;
+      background-image: url('https://image.slidesdocs.com/responsive-images/background/technology-sunset-sky-blue-evening-tower-danger-electric-powerpoint-background_93ca71dc37__960_540.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-text {
+      color: white;
+      font-size: 2.8rem;
+      font-family: 'Montserrat', sans-serif;
+      z-index: 1;
+      text-align: center;
+      padding: 0 1rem;
+    }
+
+    .vision {
+      padding: 4rem 2rem;
+      text-align: center;
+      background-color: #f5f5f5;
+    }
+
+    .vision h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2.7rem;
+      color: var(--blue-mid);
+      margin-bottom: 1rem;
+    }
+
+    .vision p {
+      font-size: 1.2rem;
+      color: var(--blue-dark);
+      max-width: 700px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .vision .instruction {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--blue-dark);
+      margin-bottom: 1rem;
+    }
+
+    .vision button {
+      padding: 0.8rem 1.5rem;
+      background-color: var(--blue-mid);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .vision button:hover {
+      background-color: var(--blue-dark);
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.2rem;
+      background-color: var(--blue-light);
+      color: white;
+      margin-top: 3rem;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-content">
+      <img src="idea.png" alt="WattWatcher Logo" class="logo" />
+      <div class="title">
+        <h1>WattWatcher</h1>
+        <p>Your Personal Energy Detective</p>
+      </div>
+    </div>
+    <nav>
+      <a href="howitworks.html">About</a>
+      <a href="impact.html">The Impact</a>
+      <a href="feedback.html">Feedback</a>
+    </nav>
+  </header>
+
+  <main class="center-content">
+    <section class="hero-image">
+      <div class="overlay">
+        <h2 class="hero-text">A Better Way to Manage Energy</h2>
+      </div>
+    </section>
+
+    <section class="vision">
+      <h2>Our Vision</h2>
+      <p>
+        We aim to revolutionize how people engage with energy, making data-driven decisions simple, intuitive, and empowering—for everyone, not just experts.
+      </p>
+      <p class="instruction">Start your energy journey now with a few simple steps.</p>
+      <button onclick="location.href='devices.html'">Get Started</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 WattWatcher. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

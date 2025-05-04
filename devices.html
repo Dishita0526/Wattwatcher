@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Energy Consumption Calculator</title>
+  <style>
+    :root {
+      --background: #d9dcd6;
+      --card: #ffffff;
+      --text: #16425b;
+      --primary: #2f6690;
+      --secondary: #3a7ca5;
+      --accent: #81c3d7;
+      --error: #e63946;
+      --warning: #fbbf24;
+      --success: #2e7d32;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--background);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .container {
+      width: 80%;
+      max-width: 800px;
+      margin: 40px auto;
+      background-color: var(--card);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--secondary);
+    }
+
+    h2, h3 {
+      color: var(--primary);
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin: 20px 0 10px;
+      color: var(--text);
+    }
+
+    input[type="number"], input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid var(--secondary);
+      background-color: #f0f2f2;
+      color: var(--text);
+      border-radius: 8px;
+      width: 90%;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+
+    input::placeholder {
+      color: #7c8c99;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      margin: 15px 5px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background-color: var(--accent);
+      color: var(--text);
+    }
+
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      font-size: 16px;
+    }
+
+    th, td {
+      border: 1px solid var(--secondary);
+      padding: 12px;
+      text-align: center;
+    }
+
+    th {
+      background-color: var(--secondary);
+      color: white;
+    }
+
+    td {
+      background-color: #eef3f4;
+      color: var(--text);
+    }
+
+    #result {
+      margin-top: 30px;
+    }
+
+    .meter-section {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px dashed var(--primary);
+    }
+
+    .message {
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .error { color: var(--error); }
+    .warning { color: var(--warning); }
+    .success { color: var(--success); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Energy Consumption Calculator</h2>
+
+    <label for="appliances">Number of Appliance Types:</label>
+    <input type="number" id="appliances" min="1" placeholder="e.g. 3" />
+    <button onclick="generateInputs()">Next</button>
+
+    <div id="inputs"></div>
+
+    <button onclick="calculateConsumption()">Calculate</button>
+
+    <div id="result"></div>
+
+    <div id="meter-section" class="meter-section" style="display: none;">
+      <h3>Compare with Actual Meter Reading</h3>
+      <label for="actualReading">Enter your actual meter reading for the month (units):</label>
+      <input type="number" id="actualReading" min="0" placeholder="e.g. 250" />
+      <button onclick="compareMeterReading()">Check Meter Reading</button>
+      <div id="comparisonResult" class="message"></div>
+    </div>
+  </div>
+
+  <script>
+    let estimatedConsumption = 0;
+
+    function generateInputs() {
+      let count = parseInt(document.getElementById("appliances").value);
+      let inputDiv = document.getElementById("inputs");
+      inputDiv.innerHTML = "";
+
+      if (isNaN(count) || count <= 0) {
+        inputDiv.innerHTML = "<p class='error'>Please enter a valid number of appliances.</p>";
+        return;
+      }
+
+      let table = `<table>
+                    <tr>
+                        <th>Appliance Name</th>
+                        <th>Power Rating (W)</th>
+                        <th>Usage Time (hrs/day)</th>
+                        <th>Quantity</th>
+                    </tr>`;
+
+      for (let i = 0; i < count; i++) {
+        table += `
+          <tr>
+              <td><input type="text" id="name${i}" placeholder="e.g. Fan" required></td>
+              <td><input type="number" id="units${i}" min="0" placeholder="e.g. 60"></td>
+              <td><input type="number" id="time${i}" min="0" placeholder="e.g. 4"></td>
+              <td><input type="number" id="qty${i}" min="1" placeholder="e.g. 2"></td>
+          </tr>`;
+      }
+
+      table += `</table>`;
+      inputDiv.innerHTML = table;
+    }
+
+    function calculateConsumption() {
+      let count = parseInt(document.getElementById("appliances").value);
+      estimatedConsumption = 0;
+      let details = "";
+
+      for (let i = 0; i < count; i++) {
+        let name = document.getElementById(`name${i}`).value || `Appliance ${i + 1}`;
+        let units = parseFloat(document.getElementById(`units${i}`).value);
+        let time = parseFloat(document.getElementById(`time${i}`).value);
+        let qty = parseInt(document.getElementById(`qty${i}`).value);
+
+        if (isNaN(units) || isNaN(time) || isNaN(qty)) continue;
+
+        let monthly = units * time * qty * 30 / 1000;
+        estimatedConsumption += monthly;
+        details += `${name}: ${monthly.toFixed(2)} units<br>`;
+      }
+
+      document.getElementById("result").innerHTML = `
+        <h3>Total Monthly Estimated Consumption: ${estimatedConsumption.toFixed(2)} units</h3><br>${details}
+      `;
+
+      document.getElementById("meter-section").style.display = "block";
+      document.getElementById("comparisonResult").innerHTML = "";
+    }
+
+    function compareMeterReading() {
+      let actual = parseFloat(document.getElementById("actualReading").value);
+      let expected = estimatedConsumption;
+
+      if (isNaN(actual)) {
+        document.getElementById("comparisonResult").innerHTML = `<span class="error">Please enter a valid meter reading.</span>`;
+        return;
+      }
+
+      let difference = actual - expected;
+      let percentageDiff = (Math.abs(difference) / expected) * 100;
+      let result = "";
+
+      if (percentageDiff > 5) {
+        if (difference > 0) {
+          result = `<span class="error">⚠️ Your meter reading is higher than expected by ${difference.toFixed(2)} units (${percentageDiff.toFixed(2)}%). Possible fault or unaccounted usage.</span>`;
+        } else {
+          result = `<span class="warning">❗ Your meter reading is significantly lower than expected by ${Math.abs(difference).toFixed(2)} units (${percentageDiff.toFixed(2)}%). Check for missing entries or misreadings.</span>`;
+        }
+      } else {
+        result = `<span class="success">✅ Your meter reading is within the expected range (±5%). No fault detected.</span>`;
+      }
+
+      document.getElementById("comparisonResult").innerHTML = result;
+    }
+  </script>
+</body>
+</html>
