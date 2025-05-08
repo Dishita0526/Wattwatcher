@@ -195,7 +195,7 @@
 
         if (isNaN(units) || isNaN(time) || isNaN(qty)) continue;
 
-        let monthly = units * time * qty * 30 / 1000; // Convert to kWh/month
+        let monthly = units * time * qty * 30 / 1000;
         estimatedConsumption += monthly;
         details += `${name}: ${monthly.toFixed(2)} units<br>`;
       }
@@ -213,10 +213,14 @@
         cost = 100 * 4.71 + 200 * 10.29 + 200 * 14.55 + (units - 500) * 16.64;
       }
 
+      let wheelingCharge = units * 1.17;
+      let totalCost = cost + wheelingCharge;
+
       document.getElementById("result").innerHTML = `
         <h3>Total Monthly Estimated Consumption: ${units.toFixed(2)} units</h3>
-        <h3>Estimated Monthly Cost: ₹${cost.toFixed(2)}</h3>
+        <h3>Estimated Monthly Cost: ₹${totalCost.toFixed(2)}</h3>
         <br>${details}
+        <strong>Total Wheeling Charges: ₹${wheelingCharge.toFixed(2)}</strong>
       `;
 
       document.getElementById("meter-section").style.display = "block";
@@ -238,7 +242,7 @@
 
       if (percentageDiff > 5) {
         if (difference > 0) {
-          result = `<span class="error">⚠️ Your meter reading is higher than expected by ${difference.toFixed(2)} units (${percentageDiff.toFixed(2)}%). Possible fault or unaccounted usage.</span>`;
+          result = `<span class="error">⚠ Your meter reading is higher than expected by ${difference.toFixed(2)} units (${percentageDiff.toFixed(2)}%). Possible fault or unaccounted usage.</span>`;
         } else {
           result = `<span class="warning">❗ Your meter reading is significantly lower than expected by ${Math.abs(difference).toFixed(2)} units (${percentageDiff.toFixed(2)}%). Check for missing entries or misreadings.</span>`;
         }
