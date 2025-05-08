@@ -195,13 +195,28 @@
 
         if (isNaN(units) || isNaN(time) || isNaN(qty)) continue;
 
-        let monthly = units * time * qty * 30 / 1000;
+        let monthly = units * time * qty * 30 / 1000; // Convert to kWh/month
         estimatedConsumption += monthly;
         details += `${name}: ${monthly.toFixed(2)} units<br>`;
       }
 
+      let units = estimatedConsumption;
+      let cost = 0;
+
+      if (units <= 100) {
+        cost = units * 4.71;
+      } else if (units <= 300) {
+        cost = 100 * 4.71 + (units - 100) * 10.29;
+      } else if (units <= 500) {
+        cost = 100 * 4.71 + 200 * 10.29 + (units - 300) * 14.55;
+      } else {
+        cost = 100 * 4.71 + 200 * 10.29 + 200 * 14.55 + (units - 500) * 16.64;
+      }
+
       document.getElementById("result").innerHTML = `
-        <h3>Total Monthly Estimated Consumption: ${estimatedConsumption.toFixed(2)} units</h3><br>${details}
+        <h3>Total Monthly Estimated Consumption: ${units.toFixed(2)} units</h3>
+        <h3>Estimated Monthly Cost: ₹${cost.toFixed(2)}</h3>
+        <br>${details}
       `;
 
       document.getElementById("meter-section").style.display = "block";
