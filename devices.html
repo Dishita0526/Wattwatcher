@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>Energy Consumption Calculator</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <style>
     :root {
       --background: #d9dcd6;
@@ -61,6 +59,10 @@
       margin-bottom: 10px;
     }
 
+    input::placeholder {
+      color: #7c8c99;
+    }
+
     button {
       padding: 12px 24px;
       font-size: 16px;
@@ -110,6 +112,13 @@
     .error { color: var(--error); }
     .warning { color: var(--warning); }
     .success { color: var(--success); }
+
+    #comparisonSection {
+      display: none;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 2px dashed var(--primary);
+    }
   </style>
 </head>
 <body>
@@ -126,15 +135,23 @@
 
     <div id="result"></div>
 
+    <div id="comparisonSection">
+      <h3>Compare with Actual Meter Reading</h3>
+      <label for="actualReading">Enter your actual meter reading (units):</label>
+      <input type="number" id="actualReading" min="0" placeholder="e.g. 250" />
+      <button onclick="compareMeterReading()">Check Meter Reading</button>
+      <div id="comparisonResult" class="message"></div>
+    </div>
+
     <div id="exportButtons" style="display:none;">
+      <button onclick="exportToJSON()">Export as JSON</button>
       <button onclick="exportToCSV()">Export as CSV</button>
-      <button onclick="exportToPDF()">Export as PDF</button>
     </div>
   </div>
 
   <script>
     let estimatedConsumption = 0;
-    let exportDetails = "";
+    let exportData = [];
 
     function generateInputs() {
       let count = parseInt(document.getElementById("appliances").value);
@@ -171,7 +188,7 @@
     function calculateConsumption() {
       let count = parseInt(document.getElementById("appliances").value);
       estimatedConsumption = 0;
-      exportDetails = "Appliance,Monthly Units\n";
+      exportData = [];
       let details = "";
 
       for (let i = 0; i < count; i++) {
@@ -185,70 +202,105 @@
         let monthly = units * time * qty * 30 / 1000;
         estimatedConsumption += monthly;
         details += `${name}: ${monthly.toFixed(2)} units<br>`;
-        exportDetails += `${name},${monthly.toFixed(2)}\n`;
+        exportData.push({ name, units, time, qty, monthly: monthly.toFixed(2) });
       }
 
+      // Cost calculation
       let units = estimatedConsumption;
-      let energyCost = 0;
+      let cost = 0;
 
       if (units <= 100) {
-        energyCost = units * 4.71;
+        cost = units * 4.71;
       } else if (units <= 300) {
-        energyCost = 100 * 4.71 + (units - 100) * 10.29;
+        cost = 100 * 4.71 + (units - 100) * 10.29;
       } else if (units <= 500) {
-        energyCost = 100 * 4.71 + 200 * 10.29 + (units - 300) * 14.55;
+        cost = 100 * 4.71 + 200 * 10.29 + (units - 300) * 14.55;
       } else {
-        energyCost = 100 * 4.71 + 200 * 10.29 + 200 * 14.55 + (units - 500) * 16.64;
+        cost = 100 * 4.71 + 200 * 10.29 + 200 * 14.55 + (units - 500) * 16.64;
       }
 
-      // ESA charges calculation
+      // ESA charges
       let esa = 0;
-      if (units <= 100) {
-        esa = units * 0.25;
-      } else if (units <= 300) {
-        esa = 100 * 0.25 + (units - 100) * 0.4;
-      } else if (units <= 500) {
-        esa = 100 * 0.25 + 200 * 0.4 + (units - 300) * 0.55;
-      } else {
-        esa = 100 * 0.25 + 200 * 0.4 + 200 * 0.55 + (units - 500) * 0.6;
-      }
+      if (units <= 100) esa = units * 0.25;
+      else if (units <= 300) esa = 100 * 0.25 + (units - 100) * 0.4;
+      else if (units <= 500) esa = 100 * 0.25 + 200 * 0.4 + (units - 300) * 0.55;
+      else esa = 100 * 0.25 + 200 * 0.4 + 200 * 0.55 + (units - 500) * 0.6;
 
-      const fixedCharge = 424;
-      const totalCost = energyCost + esa + fixedCharge;
-
-      exportDetails += `\nTotal Units,${units.toFixed(2)}\nEnergy Cost,₹${energyCost.toFixed(2)}\nESA Charges,₹${esa.toFixed(2)}\nFixed Charges,₹${fixedCharge}\nTotal Estimated Bill,₹${totalCost.toFixed(2)}`;
+      let fixedCost = 424;
+      let totalCost = cost + esa + fixedCost;
 
       document.getElementById("result").innerHTML = `
         <h3>Total Monthly Estimated Consumption: ${units.toFixed(2)} units</h3>
         <h3>Estimated Monthly Cost: ₹${totalCost.toFixed(2)}</h3>
-        <br>${details}
-        <strong>Energy Cost: ₹${energyCost.toFixed(2)}</strong><br>
+        <p><strong>Breakdown:</strong><br>${details}</p>
         <strong>ESA Charges: ₹${esa.toFixed(2)}</strong><br>
-        <strong>Fixed Charges: ₹${fixedCharge}</strong>
+        <strong>Fixed Charges: ₹${fixedCost.toFixed(2)}</strong>
       `;
 
+      document.getElementById("comparisonSection").style.display = "block";
       document.getElementById("exportButtons").style.display = "block";
+      document.getElementById("comparisonResult").innerHTML = "";
+    }
+
+    function compareMeterReading() {
+      let actual = parseFloat(document.getElementById("actualReading").value);
+      let expected = estimatedConsumption;
+
+      if (isNaN(actual)) {
+        document.getElementById("comparisonResult").innerHTML = `<span class="error">Please enter a valid meter reading.</span>`;
+        return;
+      }
+
+      let difference = actual - expected;
+      let percentageDiff = (Math.abs(difference) / expected) * 100;
+      let result = "";
+
+      if (percentageDiff > 5) {
+        if (difference > 0) {
+          result = `<span class="error">⚠ Your meter reading is higher than expected by ${difference.toFixed(2)} units (${percentageDiff.toFixed(2)}%). Possible fault or unaccounted usage.</span>`;
+        } else {
+          result = `<span class="warning">❗ Your meter reading is significantly lower than expected by ${Math.abs(difference).toFixed(2)} units (${percentageDiff.toFixed(2)}%). Check for missing entries or misreadings.</span>`;
+        }
+      } else {
+        result = `<span class="success">✅ Your meter reading is within the expected range (±5%). No fault detected.</span>`;
+      }
+
+      document.getElementById("comparisonResult").innerHTML = result;
+    }
+
+    function exportToJSON() {
+      const exportDetails = {
+        consumption: estimatedConsumption,
+        exportData: exportData,
+        totalCost: document.querySelector("#result").innerText.match(/₹(\d+(\.\d{1,2})?)/)[0],
+        esa: document.querySelector("#result").innerText.match(/ESA Charges: ₹(\d+(\.\d{1,2})?)/)[0],
+        fixedCost: document.querySelector("#result").innerText.match(/Fixed Charges: ₹(\d+(\.\d{1,2})?)/)[0]
+      };
+
+      const blob = new Blob([JSON.stringify(exportDetails, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "energy_data.json";
+      link.click();
     }
 
     function exportToCSV() {
-      const blob = new Blob([exportDetails], { type: 'text/csv;charset=utf-8;' });
-      saveAs(blob, 'energy_consumption.csv');
-    }
-
-    async function exportToPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.setFontSize(12);
-      doc.text("Energy Consumption Report", 20, 20);
-
-      const lines = exportDetails.split('\n');
-      let y = 30;
-      lines.forEach(line => {
-        doc.text(line, 20, y);
-        y += 8;
+      let csv = "Appliance,Power(W),Usage(hrs/day),Quantity,MonthlyUnits\n";
+      exportData.forEach(item => {
+        csv += `${item.name},${item.units},${item.time},${item.qty},${item.monthly}\n`;
       });
 
-      doc.save("energy_consumption.pdf");
+      csv += `\nTotal Cost, , , , ₹${document.querySelector("#result").innerText.match(/₹(\d+(\.\d{1,2})?)/)[0]}\n`;
+      csv += `ESA Charges, , , , ₹${document.querySelector("#result").innerText.match(/ESA Charges: ₹(\d+(\.\d{1,2})?)/)[0]}\n`;
+      csv += `Fixed Charges, , , , ₹${document.querySelector("#result").innerText.match(/Fixed Charges: ₹(\d+(\.\d{1,2})?)/)[0]}\n`;
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "energy_data.csv";
+      link.click();
     }
   </script>
 </body>
