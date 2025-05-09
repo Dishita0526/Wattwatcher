@@ -182,6 +182,20 @@
       inputDiv.innerHTML = table;
     }
 
+    function calculateESA(units) {
+      let esa = 0;
+      if (units <= 100) {
+        esa = units * 0.25;
+      } else if (units <= 300) {
+        esa = 100 * 0.25 + (units - 100) * 0.4;
+      } else if (units <= 500) {
+        esa = 100 * 0.25 + 200 * 0.4 + (units - 300) * 0.55;
+      } else {
+        esa = 100 * 0.25 + 200 * 0.4 + 200 * 0.55 + (units - 500) * 0.6;
+      }
+      return esa;
+    }
+
     function calculateConsumption() {
       let count = parseInt(document.getElementById("appliances").value);
       estimatedConsumption = 0;
@@ -201,26 +215,29 @@
       }
 
       let units = estimatedConsumption;
-      let cost = 0;
+      let energyCost = 0;
 
       if (units <= 100) {
-        cost = units * 4.71;
+        energyCost = units * 4.71;
       } else if (units <= 300) {
-        cost = 100 * 4.71 + (units - 100) * 10.29;
+        energyCost = 100 * 4.71 + (units - 100) * 10.29;
       } else if (units <= 500) {
-        cost = 100 * 4.71 + 200 * 10.29 + (units - 300) * 14.55;
+        energyCost = 100 * 4.71 + 200 * 10.29 + (units - 300) * 14.55;
       } else {
-        cost = 100 * 4.71 + 200 * 10.29 + 200 * 14.55 + (units - 500) * 16.64;
+        energyCost = 100 * 4.71 + 200 * 10.29 + 200 * 14.55 + (units - 500) * 16.64;
       }
 
-      let wheelingCharge = units * 1.17;
-      let totalCost = cost + wheelingCharge;
+      let fixedCharge = 424;
+      let esaCharge = calculateESA(units);
+      let totalCost = energyCost + esaCharge + fixedCharge;
 
       document.getElementById("result").innerHTML = `
         <h3>Total Monthly Estimated Consumption: ${units.toFixed(2)} units</h3>
         <h3>Estimated Monthly Cost: ₹${totalCost.toFixed(2)}</h3>
+        <p><strong>Energy Cost:</strong> ₹${energyCost.toFixed(2)}</p>
+        <p><strong>ESA Charges:</strong> ₹${esaCharge.toFixed(2)}</p>
+        <p><strong>Fixed Charges:</strong> ₹${fixedCharge.toFixed(2)}</p>
         <br>${details}
-        <strong>Total Wheeling Charges: ₹${wheelingCharge.toFixed(2)}</strong>
       `;
 
       document.getElementById("meter-section").style.display = "block";
