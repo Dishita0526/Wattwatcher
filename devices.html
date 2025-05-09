@@ -144,7 +144,6 @@
     </div>
 
     <div id="exportButtons" style="display:none;">
-      <button onclick="exportToJSON()">Export as JSON</button>
       <button onclick="exportToCSV()">Export as CSV</button>
     </div>
   </div>
@@ -266,23 +265,6 @@
       }
 
       document.getElementById("comparisonResult").innerHTML = result;
-    }
-
-    function exportToJSON() {
-      const exportDetails = {
-        consumption: estimatedConsumption,
-        exportData: exportData,
-        totalCost: document.querySelector("#result").innerText.match(/₹(\d+(\.\d{1,2})?)/)[0],
-        esa: document.querySelector("#result").innerText.match(/ESA Charges: ₹(\d+(\.\d{1,2})?)/)[0],
-        fixedCost: document.querySelector("#result").innerText.match(/Fixed Charges: ₹(\d+(\.\d{1,2})?)/)[0]
-      };
-
-      const blob = new Blob([JSON.stringify(exportDetails, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "energy_data.json";
-      link.click();
     }
 
     function exportToCSV() {
