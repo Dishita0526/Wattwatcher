@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <title>Energy Consumption Calculator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <style>
     :root {
       --background: #d9dcd6;
@@ -59,10 +61,6 @@
       margin-bottom: 10px;
     }
 
-    input::placeholder {
-      color: #7c8c99;
-    }
-
     button {
       padding: 12px 24px;
       font-size: 16px;
@@ -104,16 +102,6 @@
       color: var(--text);
     }
 
-    #result {
-      margin-top: 30px;
-    }
-
-    .meter-section {
-      margin-top: 40px;
-      padding-top: 20px;
-      border-top: 2px dashed var(--primary);
-    }
-
     .message {
       font-weight: bold;
       margin-top: 20px;
@@ -138,17 +126,15 @@
 
     <div id="result"></div>
 
-    <div id="meter-section" class="meter-section" style="display: none;">
-      <h3>Compare with Actual Meter Reading</h3>
-      <label for="actualReading">Enter your actual meter reading for the month (units):</label>
-      <input type="number" id="actualReading" min="0" placeholder="e.g. 250" />
-      <button onclick="compareMeterReading()">Check Meter Reading</button>
-      <div id="comparisonResult" class="message"></div>
+    <div id="exportButtons" style="display:none;">
+      <button onclick="exportToCSV()">Export as CSV</button>
+      <button onclick="exportToPDF()">Export as PDF</button>
     </div>
   </div>
 
   <script>
     let estimatedConsumption = 0;
+    let exportDetails = "";
 
     function generateInputs() {
       let count = parseInt(document.getElementById("appliances").value);
@@ -182,23 +168,10 @@
       inputDiv.innerHTML = table;
     }
 
-    function calculateESA(units) {
-      let esa = 0;
-      if (units <= 100) {
-        esa = units * 0.25;
-      } else if (units <= 300) {
-        esa = 100 * 0.25 + (units - 100) * 0.4;
-      } else if (units <= 500) {
-        esa = 100 * 0.25 + 200 * 0.4 + (units - 300) * 0.55;
-      } else {
-        esa = 100 * 0.25 + 200 * 0.4 + 200 * 0.55 + (units - 500) * 0.6;
-      }
-      return esa;
-    }
-
     function calculateConsumption() {
       let count = parseInt(document.getElementById("appliances").value);
       estimatedConsumption = 0;
+      exportDetails = "Appliance,Monthly Units\n";
       let details = "";
 
       for (let i = 0; i < count; i++) {
@@ -212,6 +185,7 @@
         let monthly = units * time * qty * 30 / 1000;
         estimatedConsumption += monthly;
         details += `${name}: ${monthly.toFixed(2)} units<br>`;
+        exportDetails += `${name},${monthly.toFixed(2)}\n`;
       }
 
       let units = estimatedConsumption;
@@ -227,47 +201,54 @@
         energyCost = 100 * 4.71 + 200 * 10.29 + 200 * 14.55 + (units - 500) * 16.64;
       }
 
-      let fixedCharge = 424;
-      let esaCharge = calculateESA(units);
-      let totalCost = energyCost + esaCharge + fixedCharge;
+      // ESA charges calculation
+      let esa = 0;
+      if (units <= 100) {
+        esa = units * 0.25;
+      } else if (units <= 300) {
+        esa = 100 * 0.25 + (units - 100) * 0.4;
+      } else if (units <= 500) {
+        esa = 100 * 0.25 + 200 * 0.4 + (units - 300) * 0.55;
+      } else {
+        esa = 100 * 0.25 + 200 * 0.4 + 200 * 0.55 + (units - 500) * 0.6;
+      }
+
+      const fixedCharge = 424;
+      const totalCost = energyCost + esa + fixedCharge;
+
+      exportDetails += `\nTotal Units,${units.toFixed(2)}\nEnergy Cost,₹${energyCost.toFixed(2)}\nESA Charges,₹${esa.toFixed(2)}\nFixed Charges,₹${fixedCharge}\nTotal Estimated Bill,₹${totalCost.toFixed(2)}`;
 
       document.getElementById("result").innerHTML = `
         <h3>Total Monthly Estimated Consumption: ${units.toFixed(2)} units</h3>
         <h3>Estimated Monthly Cost: ₹${totalCost.toFixed(2)}</h3>
-        <p><strong>Energy Cost:</strong> ₹${energyCost.toFixed(2)}</p>
-        <p><strong>ESA Charges:</strong> ₹${esaCharge.toFixed(2)}</p>
-        <p><strong>Fixed Charges:</strong> ₹${fixedCharge.toFixed(2)}</p>
         <br>${details}
+        <strong>Energy Cost: ₹${energyCost.toFixed(2)}</strong><br>
+        <strong>ESA Charges: ₹${esa.toFixed(2)}</strong><br>
+        <strong>Fixed Charges: ₹${fixedCharge}</strong>
       `;
 
-      document.getElementById("meter-section").style.display = "block";
-      document.getElementById("comparisonResult").innerHTML = "";
+      document.getElementById("exportButtons").style.display = "block";
     }
 
-    function compareMeterReading() {
-      let actual = parseFloat(document.getElementById("actualReading").value);
-      let expected = estimatedConsumption;
+    function exportToCSV() {
+      const blob = new Blob([exportDetails], { type: 'text/csv;charset=utf-8;' });
+      saveAs(blob, 'energy_consumption.csv');
+    }
 
-      if (isNaN(actual)) {
-        document.getElementById("comparisonResult").innerHTML = `<span class="error">Please enter a valid meter reading.</span>`;
-        return;
-      }
+    async function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(12);
+      doc.text("Energy Consumption Report", 20, 20);
 
-      let difference = actual - expected;
-      let percentageDiff = (Math.abs(difference) / expected) * 100;
-      let result = "";
+      const lines = exportDetails.split('\n');
+      let y = 30;
+      lines.forEach(line => {
+        doc.text(line, 20, y);
+        y += 8;
+      });
 
-      if (percentageDiff > 5) {
-        if (difference > 0) {
-          result = `<span class="error">⚠ Your meter reading is higher than expected by ${difference.toFixed(2)} units (${percentageDiff.toFixed(2)}%). Possible fault or unaccounted usage.</span>`;
-        } else {
-          result = `<span class="warning">❗ Your meter reading is significantly lower than expected by ${Math.abs(difference).toFixed(2)} units (${percentageDiff.toFixed(2)}%). Check for missing entries or misreadings.</span>`;
-        }
-      } else {
-        result = `<span class="success">✅ Your meter reading is within the expected range (±5%). No fault detected.</span>`;
-      }
-
-      document.getElementById("comparisonResult").innerHTML = result;
+      doc.save("energy_consumption.pdf");
     }
   </script>
 </body>
