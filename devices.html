@@ -204,7 +204,7 @@
         exportData.push({ name, units, time, qty, monthly: monthly.toFixed(2) });
       }
 
-      // Cost calculation
+      // Base cost calculation
       let units = estimatedConsumption;
       let cost = 0;
 
@@ -225,14 +225,20 @@
       else if (units <= 500) esa = 100 * 0.25 + 200 * 0.4 + (units - 300) * 0.55;
       else esa = 100 * 0.25 + 200 * 0.4 + 200 * 0.55 + (units - 500) * 0.6;
 
+      // Additional charges
       let fixedCost = 434;
-      let totalCost = cost + esa + fixedCost;
+      let lightCharge = cost * 0.16;
+      let transportCharge = units * 1.17;
+      let totalCost = cost + esa + fixedCost + lightCharge + transportCharge;
 
       document.getElementById("result").innerHTML = `
         <h3>Total Monthly Estimated Consumption: ${units.toFixed(2)} units</h3>
         <h3>Estimated Monthly Cost: ₹${totalCost.toFixed(2)}</h3>
         <p><strong>Breakdown:</strong><br>${details}</p>
+        <strong>Base Energy Cost: ₹${cost.toFixed(2)}</strong><br>
         <strong>ESA Charges: ₹${esa.toFixed(2)}</strong><br>
+        <strong>Light Charges (16%): ₹${lightCharge.toFixed(2)}</strong><br>
+        <strong>Transport Charges: ₹${transportCharge.toFixed(2)}</strong><br>
         <strong>Fixed Charges: ₹${fixedCost.toFixed(2)}</strong>
       `;
 
@@ -273,9 +279,19 @@
         csv += `${item.name},${item.units},${item.time},${item.qty},${item.monthly}\n`;
       });
 
-      csv += `\nTotal Cost, , , , ₹${document.querySelector("#result").innerText.match(/₹(\d+(\.\d{1,2})?)/)[0]}\n`;
-      csv += `ESA Charges, , , , ₹${document.querySelector("#result").innerText.match(/ESA Charges: ₹(\d+(\.\d{1,2})?)/)[0]}\n`;
-      csv += `Fixed Charges, , , , ₹${document.querySelector("#result").innerText.match(/Fixed Charges: ₹(\d+(\.\d{1,2})?)/)[0]}\n`;
+      const resultText = document.querySelector("#result").innerText;
+
+      const extract = (label) => {
+        const match = resultText.match(new RegExp(label + ": ₹(\\d+(\\.\\d{1,2})?)"));
+        return match ? match[1] : "0";
+      };
+
+      csv += `\nBase Cost, , , , ₹${extract("Base Energy Cost")}\n`;
+      csv += `ESA Charges, , , , ₹${extract("ESA Charges")}\n`;
+      csv += `Light Charges, , , , ₹${extract("Light Charges")}\n`;
+      csv += `Transport Charges, , , , ₹${extract("Transport Charges")}\n`;
+      csv += `Fixed Charges, , , , ₹${extract("Fixed Charges")}\n`;
+      csv += `Total Cost, , , , ₹${extract("Estimated Monthly Cost")}\n`;
 
       const blob = new Blob([csv], { type: "text/csv" });
       const url = URL.createObjectURL(blob);
