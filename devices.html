@@ -151,6 +151,7 @@
   <script>
     let estimatedConsumption = 0;
     let exportData = [];
+    let esa = 0, transportCost = 0, fixedCost = 434, lightCharge = 0, totalCost = 0;
 
     function generateInputs() {
       let count = parseInt(document.getElementById("appliances").value);
@@ -205,33 +206,32 @@
       }
 
       let units = estimatedConsumption;
-      let base = 0;
+      let cost = 0;
 
-      if (units <= 100) base = units * 4.71;
-      else if (units <= 300) base = 100 * 4.71 + (units - 100) * 10.29;
-      else if (units <= 500) base = 100 * 4.71 + 200 * 10.29 + (units - 300) * 14.55;
-      else base = 100 * 4.71 + 200 * 10.29 + 200 * 14.55 + (units - 500) * 16.64;
+      if (units <= 100) cost = units * 4.71;
+      else if (units <= 300) cost = 100 * 4.71 + (units - 100) * 10.29;
+      else if (units <= 500) cost = 100 * 4.71 + 200 * 10.29 + (units - 300) * 14.55;
+      else cost = 100 * 4.71 + 200 * 10.29 + 200 * 14.55 + (units - 500) * 16.64;
 
-      let esa = units <= 100 ? units * 0.25 :
-                units <= 300 ? 100 * 0.25 + (units - 100) * 0.4 :
-                units <= 500 ? 100 * 0.25 + 200 * 0.4 + (units - 300) * 0.55 :
-                               100 * 0.25 + 200 * 0.4 + 200 * 0.55 + (units - 500) * 0.6;
+      // Additional charges
+      if (units <= 100) esa = units * 0.25;
+      else if (units <= 300) esa = 100 * 0.25 + (units - 100) * 0.4;
+      else if (units <= 500) esa = 100 * 0.25 + 200 * 0.4 + (units - 300) * 0.55;
+      else esa = 100 * 0.25 + 200 * 0.4 + 200 * 0.55 + (units - 500) * 0.6;
 
-      let transport = units * 1.17;
-      let fixedCost = 434;
-
-      let subtotal = base + esa + transport + fixedCost;
-      let lightCharge = subtotal * 0.16;
-      let total = subtotal + lightCharge;
+      transportCost = units * 1.17;
+      let subtotal = cost + esa + transportCost + fixedCost;
+      lightCharge = subtotal * 0.16;
+      totalCost = subtotal + lightCharge;
 
       document.getElementById("result").innerHTML = `
         <h3>Total Monthly Estimated Consumption: ${units.toFixed(2)} units</h3>
-        <h3>Estimated Monthly Cost: ₹${total.toFixed(2)}</h3>
+        <h3>Estimated Monthly Cost: ₹${totalCost.toFixed(2)}</h3>
         <p><strong>Breakdown:</strong><br>${details}</p>
         <strong>ESA Charges: ₹${esa.toFixed(2)}</strong><br>
-        <strong>Electricity Transport Charge: ₹${transport.toFixed(2)}</strong><br>
+        <strong>Transport Charges: ₹${transportCost.toFixed(2)}</strong><br>
         <strong>Fixed Charges: ₹${fixedCost.toFixed(2)}</strong><br>
-        <strong>Light Charge (16%): ₹${lightCharge.toFixed(2)}</strong>
+        <strong>Light Charges (16%): ₹${lightCharge.toFixed(2)}</strong>
       `;
 
       document.getElementById("comparisonSection").style.display = "block";
@@ -253,15 +253,40 @@
       let result = "";
 
       if (percentageDiff > 5) {
-        result = difference > 0
-          ? `<span class="error">⚠ Your meter reading is higher than expected by ${difference.toFixed(2)} units (${percentageDiff.toFixed(2)}%). Possible fault or unaccounted usage.</span>`
-          : `<span class="warning">❗ Your meter reading is significantly lower than expected by ${Math.abs(difference).toFixed(2)} units (${percentageDiff.toFixed(2)}%). Check for missing entries or misreadings.</span>`;
+        if (difference > 0) {
+          result = `<span class="error">⚠ Your meter reading is higher than expected by ${difference.toFixed(2)} units (${percentageDiff.toFixed(2)}%). Possible fault or unaccounted usage.</span>`;
+        } else {
+          result = `<span class="warning">❗ Your meter reading is significantly lower than expected by ${Math.abs(difference).toFixed(2)} units (${percentageDiff.toFixed(2)}%). Check for missing entries or misreadings.</span>`;
+        }
       } else {
         result = `<span class="success">✅ Your meter reading is within the expected range (±5%). No fault detected.</span>`;
       }
 
       document.getElementById("comparisonResult").innerHTML = result;
     }
+
+    function exportToCSV() {
+      let csv = "Appliance,Power(W),Usage(hrs/day),Quantity,MonthlyUnits\n";
+      exportData.forEach(item => {
+        csv += `${item.name},${item.units},${item.time},${item.qty},${item.monthly}\n`;
+      });
+
+      csv += `\nESA Charges, , , , ₹${esa.toFixed(2)}\n`;
+      csv += `Transport Charges, , , , ₹${transportCost.toFixed(2)}\n`;
+      csv += `Fixed Charges, , , , ₹${fixedCost.toFixed(2)}\n`;
+      csv += `Light Charges (16%), , , , ₹${lightCharge.toFixed(2)}\n`;
+      csv += `Total Cost, , , , ₹${totalCost.toFixed(2)}\n`;
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "energy_data.csv";
+      link.click();
+    }
   </script>
 </body>
 </html>
+
+
+  
